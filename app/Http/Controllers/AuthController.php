@@ -43,7 +43,7 @@ class AuthController extends Controller
 
         } catch (\Throwable $th) {
             DB::rollBack();
-            return new ApiResource(false, $th->getMessage(), null);
+            return response()->json($th->getMessage(), 500);
         }
     }
 

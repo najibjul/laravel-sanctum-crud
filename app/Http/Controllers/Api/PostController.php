@@ -47,7 +47,7 @@ class PostController extends Controller
 
         } catch (\Throwable $error) {
             DB::rollBack();
-            return new ApiResource(false, $error->getMessage(), null);
+            return response()->json($error->getMessage(), 500);
         }
     }
 
@@ -74,6 +74,10 @@ class PostController extends Controller
         try {
             $post = Post::find($id);
 
+            if (!$post) {
+                return response()->json('Data not found', 404);   
+            }
+
             if ($request->hasFile('image')) {
 
                 $image = $request->file('image');
@@ -99,7 +103,7 @@ class PostController extends Controller
 
         } catch (\Throwable $error) {
             DB::rollBack();
-            return new ApiResource(false, $error->getMessage(), null);
+            return response()->json($error->getMessage(), 500);
         }
     }
 
@@ -110,16 +114,20 @@ class PostController extends Controller
         try {
             $post = Post::find($id);
 
+            if (!$post) {
+                return response()->json('Data not found', 404);   
+            }
+
             Storage::delete('public/posts/' . basename($post->image));
 
             $post->delete();
 
             DB::commit();
-            return new ApiResource(true, 'Data Post Berhasil Dihapus!', null);
-        } catch (\Throwable $error) {
+            return response()->noContent();
 
+        } catch (\Throwable $error) {
             DB::rollBack();
-            return new ApiResource(false, $error->getMessage(), null);
+            return response()->json($error->getMessage(), 500);
         }
     }
 }
